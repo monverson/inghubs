@@ -17,7 +17,7 @@ public class Order {
     @ManyToOne
     private Customer customer;
     private String assetName;
-    private String orderSide;
+    private Side orderSide;
     private BigDecimal size;
     private BigDecimal price;
     private Status status;
