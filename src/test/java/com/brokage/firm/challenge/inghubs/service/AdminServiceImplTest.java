@@ -34,31 +34,48 @@ class AdminServiceImplTest {
     @Autowired
     private AdminService adminService;
 
-    private Customer testCustomer;
+    private Customer firstTestCustomer;
+
+    private Customer secondTestCustomer;
 
     @BeforeEach
     void setUp() {
-        testCustomer = new Customer();
-        testCustomer.setUsername("testUser");
-        testCustomer.setPassword("password");
-        testCustomer.setRole("CUSTOMER");
-        customerRepository.save(testCustomer);
+        firstTestCustomer = new Customer();
+        firstTestCustomer.setUsername("testUser");
+        firstTestCustomer.setPassword("password");
+        firstTestCustomer.setRole("CUSTOMER");
+        customerRepository.save(firstTestCustomer);
+
+        secondTestCustomer = new Customer();
+        secondTestCustomer.setUsername("testUser");
+        secondTestCustomer.setPassword("password");
+        secondTestCustomer.setRole("CUSTOMER");
+        customerRepository.save(secondTestCustomer);
 
         Asset tryAsset = new Asset();
-        tryAsset.setCustomer(testCustomer);
+        tryAsset.setCustomer(firstTestCustomer);
+        tryAsset.setCustomer(secondTestCustomer);
         tryAsset.setAssetName(TRY);
         tryAsset.setSize(BigDecimal.valueOf(10000));
         tryAsset.setUsableSize(BigDecimal.valueOf(10000));
         assetRepository.save(tryAsset);
+
+
+        Asset goldAsset = new Asset();
+        goldAsset.setCustomer(secondTestCustomer);
+        goldAsset.setAssetName("Gold");
+        goldAsset.setSize(BigDecimal.valueOf(10000));
+        goldAsset.setUsableSize(BigDecimal.valueOf(10000));
+        assetRepository.save(goldAsset);
     }
 
     @Test
-    void matchOrder_shouldUpdateOrderAndAssets() {
+    void matchOrderBuy_shouldUpdateOrderAndAssets() {
         //given
 
         // Create a pending buy order
         Order buyOrder = new Order();
-        buyOrder.setCustomer(testCustomer);
+        buyOrder.setCustomer(firstTestCustomer);
         buyOrder.setAssetName("Gold");
         buyOrder.setOrderSide(Side.BUY);
         buyOrder.setSize(BigDecimal.valueOf(10));
@@ -72,12 +89,41 @@ class AdminServiceImplTest {
 
         // Retrieve updated data
         Order matchedOrder = orderRepository.findById(createdOrder.getId()).orElseThrow();
-        Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(testCustomer.getId(), "TRY").orElseThrow();
-        Asset aaplAsset = assetRepository.findByCustomerIdAndAssetName(testCustomer.getId(), "Gold").orElseThrow();
+        Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(firstTestCustomer.getId(), TRY).orElseThrow();
+        Asset goldAsset = assetRepository.findByCustomerIdAndAssetName(firstTestCustomer.getId(), "Gold").orElseThrow();
 
         //then
         assertEquals(Status.MATCHED, matchedOrder.getStatus());
         assertEquals(BigDecimal.valueOf(9000), tryAsset.getUsableSize()); // 10000 - (10 * 100)
-        assertEquals(BigDecimal.valueOf(10), aaplAsset.getSize());
+        assertEquals(BigDecimal.valueOf(10), goldAsset.getSize());
+    }
+
+    @Test
+    void matchOrderSell_shouldUpdateOrderAndAssets() {
+        //given
+
+        // Create a pending sell order
+        Order sellOrder = new Order();
+        sellOrder.setCustomer(secondTestCustomer);
+        sellOrder.setAssetName("Gold");
+        sellOrder.setOrderSide(Side.SELL);
+        sellOrder.setSize(BigDecimal.valueOf(10));
+        sellOrder.setPrice(BigDecimal.valueOf(100));
+        Order createdOrder = orderService.createOrder(sellOrder);
+
+        //when
+
+        // Match the order
+        adminService.matchOrder(createdOrder.getId());
+
+        // Retrieve updated data
+        Order matchedOrder = orderRepository.findById(createdOrder.getId()).orElseThrow();
+        Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(secondTestCustomer.getId(), TRY).orElseThrow();
+        Asset goldAsset = assetRepository.findByCustomerIdAndAssetName(secondTestCustomer.getId(), "Gold").orElseThrow();
+
+        //then
+        assertEquals(Status.MATCHED, matchedOrder.getStatus());
+        assertEquals(BigDecimal.valueOf(11000), tryAsset.getUsableSize()); // 10000 + (10 * 100)
+        assertEquals(BigDecimal.valueOf(9990), goldAsset.getUsableSize());
     }
 }
