@@ -1,6 +1,7 @@
 package com.brokage.firm.challenge.inghubs.service;
 
 import com.brokage.firm.challenge.inghubs.entity.*;
+import com.brokage.firm.challenge.inghubs.exception.PendingOrderNotMatchedException;
 import com.brokage.firm.challenge.inghubs.repository.AssetRepository;
 import com.brokage.firm.challenge.inghubs.repository.CustomerRepository;
 import com.brokage.firm.challenge.inghubs.repository.OrderRepository;
@@ -12,8 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 
+import static com.brokage.firm.challenge.inghubs.helper.Constant.PENDING_ORDER_CAN_BE_MATCHED;
 import static com.brokage.firm.challenge.inghubs.helper.Constant.TRY;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -52,14 +55,19 @@ class AdminServiceImplTest {
         secondTestCustomer.setRole("CUSTOMER");
         customerRepository.save(secondTestCustomer);
 
-        Asset tryAsset = new Asset();
-        tryAsset.setCustomer(firstTestCustomer);
-        tryAsset.setCustomer(secondTestCustomer);
-        tryAsset.setAssetName(TRY);
-        tryAsset.setSize(BigDecimal.valueOf(10000));
-        tryAsset.setUsableSize(BigDecimal.valueOf(10000));
-        assetRepository.save(tryAsset);
+        Asset firstTryAsset = new Asset();
+        firstTryAsset.setCustomer(firstTestCustomer);
+        firstTryAsset.setAssetName(TRY);
+        firstTryAsset.setSize(BigDecimal.valueOf(10000));
+        firstTryAsset.setUsableSize(BigDecimal.valueOf(10000));
+        assetRepository.save(firstTryAsset);
 
+        Asset secondTryAsset = new Asset();
+        secondTryAsset.setCustomer(secondTestCustomer);
+        secondTryAsset.setAssetName(TRY);
+        secondTryAsset.setSize(BigDecimal.valueOf(10000));
+        secondTryAsset.setUsableSize(BigDecimal.valueOf(10000));
+        assetRepository.save(secondTryAsset);
 
         Asset goldAsset = new Asset();
         goldAsset.setCustomer(secondTestCustomer);
@@ -125,5 +133,26 @@ class AdminServiceImplTest {
         assertEquals(Status.MATCHED, matchedOrder.getStatus());
         assertEquals(BigDecimal.valueOf(11000), tryAsset.getUsableSize()); // 10000 + (10 * 100)
         assertEquals(BigDecimal.valueOf(9990), goldAsset.getUsableSize());
+    }
+
+    @Test
+    void matchOrder_withNotPendingStatus_shouldThrowException() {
+        //given
+
+        // Create a pending sell order
+        Order sellOrder = new Order();
+        sellOrder.setCustomer(secondTestCustomer);
+        sellOrder.setAssetName("Gold");
+        sellOrder.setOrderSide(Side.SELL);
+        sellOrder.setSize(BigDecimal.valueOf(10));
+        sellOrder.setPrice(BigDecimal.valueOf(100));
+        Order createdOrder = orderService.createOrder(sellOrder);
+        createdOrder.setStatus(Status.CANCELED);
+
+        //when
+        Exception exception = assertThrows(PendingOrderNotMatchedException.class, () -> adminService.matchOrder(createdOrder.getId()));
+
+        //then
+        assertEquals(PENDING_ORDER_CAN_BE_MATCHED, exception.getMessage());
     }
 }
