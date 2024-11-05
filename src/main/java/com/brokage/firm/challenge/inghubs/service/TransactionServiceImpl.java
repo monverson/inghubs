@@ -2,6 +2,8 @@ package com.brokage.firm.challenge.inghubs.service;
 
 import com.brokage.firm.challenge.inghubs.entity.Asset;
 import com.brokage.firm.challenge.inghubs.entity.Customer;
+import com.brokage.firm.challenge.inghubs.exception.InsufficientFundsException;
+import com.brokage.firm.challenge.inghubs.exception.NotFoundException;
 import com.brokage.firm.challenge.inghubs.repository.AssetRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +22,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void deposit(Long customerId, BigDecimal amount) {
-        Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY)
-                .orElseGet(() -> createAsset(customerId));
+        Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY).orElseGet(() -> createAsset(customerId));
 
         asset.setSize(asset.getSize().add(amount));
         asset.setUsableSize(asset.getUsableSize().add(amount));
@@ -30,10 +31,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public void withdraw(Long customerId, BigDecimal amount) {
-        Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY)
-                .orElseThrow(() -> new RuntimeException(CUSTOMER_ASSET_NOT_FOUND));
+        Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY).orElseThrow(() -> new NotFoundException(CUSTOMER_ASSET_NOT_FOUND));
         if (asset.getUsableSize().compareTo(amount) < 0) {
-            throw new RuntimeException(INSUFFICIENT_FUNDS_FOR_BUY_ORDER);
+            throw new InsufficientFundsException(INSUFFICIENT_FUNDS_FOR_BUY_ORDER);
         }
         asset.setUsableSize(asset.getUsableSize().subtract(amount));
         assetRepository.save(asset);
