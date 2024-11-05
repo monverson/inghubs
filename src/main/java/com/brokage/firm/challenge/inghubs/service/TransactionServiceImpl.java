@@ -33,7 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
         Asset asset = assetRepository.findByCustomerIdAndAssetName(customerId, TRY)
                 .orElseThrow(() -> new RuntimeException(CUSTOMER_ASSET_NOT_FOUND));
         if (asset.getUsableSize().compareTo(amount) < 0) {
-            throw new RuntimeException(INSUFFICIENT_FUNDS);
+            throw new RuntimeException(INSUFFICIENT_FUNDS_FOR_BUY_ORDER);
         }
         asset.setUsableSize(asset.getUsableSize().subtract(amount));
         assetRepository.save(asset);
@@ -41,9 +41,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private Asset createAsset(Long customerId) {
         Asset asset = new Asset();
-        Customer customer = new Customer();
-        customer.setId(customerId);
-        asset.setCustomer(customer);
+        asset.setCustomer(new Customer(customerId));
         asset.setAssetName(TRY);
         asset.setSize(BigDecimal.ZERO);
         asset.setUsableSize(BigDecimal.ZERO);

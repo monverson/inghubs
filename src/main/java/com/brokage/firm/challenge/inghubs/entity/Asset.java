@@ -16,8 +16,8 @@ public class Asset {
     @ManyToOne
     private Customer customer;
     private String assetName;
-    private BigDecimal size;
-    private BigDecimal usableSize;
+    private BigDecimal size = BigDecimal.ZERO;
+    private BigDecimal usableSize = BigDecimal.ZERO;
 
     public Asset() {}
 

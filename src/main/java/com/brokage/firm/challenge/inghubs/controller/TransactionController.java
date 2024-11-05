@@ -1,6 +1,6 @@
 package com.brokage.firm.challenge.inghubs.controller;
 
-import com.brokage.firm.challenge.inghubs.service.TransactionServiceImpl;
+import com.brokage.firm.challenge.inghubs.service.TransactionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,21 +13,21 @@ import java.math.BigDecimal;
 @RequestMapping("/transactions")
 public class TransactionController {
 
-    private final TransactionServiceImpl transactionServiceImpl;
+    private final TransactionService transactionService;
 
-    public TransactionController(TransactionServiceImpl transactionServiceImpl) {
-        this.transactionServiceImpl = transactionServiceImpl;
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
     }
 
     @PostMapping("/deposit")
     public ResponseEntity<Void> deposit(@RequestParam Long customerId, @RequestParam BigDecimal amount) {
-        transactionServiceImpl.deposit(customerId, amount);
+        transactionService.deposit(customerId, amount);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/withdraw")
     public ResponseEntity<Void> withdraw(@RequestParam Long customerId, @RequestParam BigDecimal amount) {
-        transactionServiceImpl.withdraw(customerId, amount);
+        transactionService.withdraw(customerId, amount);
         return ResponseEntity.ok().build();
     }
 }

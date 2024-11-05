@@ -5,6 +5,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 @Entity
 @Data
@@ -15,4 +16,9 @@ public class Customer {
     private String username;
     private String password;
     private String role;
+    public Customer() {}
+    public Customer(Long id) {
+        this.id = id;
+    }
+
 }

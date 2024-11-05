@@ -4,6 +4,8 @@ import com.brokage.firm.challenge.inghubs.entity.Asset;
 import com.brokage.firm.challenge.inghubs.entity.Order;
 import com.brokage.firm.challenge.inghubs.entity.Side;
 import com.brokage.firm.challenge.inghubs.entity.Status;
+import com.brokage.firm.challenge.inghubs.exception.InsufficientFundsException;
+import com.brokage.firm.challenge.inghubs.exception.NotFoundException;
 import com.brokage.firm.challenge.inghubs.repository.AssetRepository;
 import com.brokage.firm.challenge.inghubs.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -28,29 +30,25 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order createOrder(Order order) {
-        Asset asset = assetRepository.findByCustomerIdAndAssetName(order.getCustomer().getId(), TRY)
-                .orElseThrow(() -> new RuntimeException(CUSTOMER_ASSET_NOT_FOUND));
+        Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(order.getCustomer().getId(), TRY)
+                .orElseThrow(() -> new NotFoundException(CUSTOMER_ASSET_NOT_FOUND));
 
-        // Check enough funds for requesting orders
-        if (order.getOrderSide() == Side.BUY) {
-            BigDecimal totalCost = order.getPrice().multiply(order.getSize());
-            if (asset.getUsableSize().compareTo(totalCost) < 0) {
-                throw new RuntimeException(INSUFFICIENT_FUNDS);
+        BigDecimal totalCost = order.getPrice().multiply(order.getSize());
+        if (order.getOrderSide()== Side.BUY && tryAsset.getUsableSize().compareTo(totalCost) < 0) {
+            throw new InsufficientFundsException(INSUFFICIENT_FUNDS_FOR_BUY_ORDER);
+        } else if (order.getOrderSide()== Side.SELL) {
+            Asset asset = assetRepository.findByCustomerIdAndAssetName(order.getCustomer().getId(), order.getAssetName())
+                    .orElseThrow(() -> new NotFoundException(ASSET_NOT_FOUND_FOR_SELL_ORDER));
+            if (asset.getUsableSize().compareTo(order.getSize()) < 0) {
+                throw new InsufficientFundsException(INSUFFICIENT_ASSET_TO_MATCH_THE_SELL_ORDER);
             }
-            asset.setUsableSize(asset.getUsableSize().subtract(totalCost));
-        } else if (order.getOrderSide() == Side.SELL) {
-            Asset sellAsset = assetRepository.findByCustomerIdAndAssetName(order.getCustomer().getId(), order.getAssetName())
-                    .orElseThrow(() -> new RuntimeException(ASSET_NOT_FOUND));
-            if (sellAsset.getUsableSize().compareTo(order.getSize()) < 0) {
-                throw new RuntimeException(INSUFFICIENT_ASSET_SIZE);
-            }
-            sellAsset.setUsableSize(sellAsset.getUsableSize().subtract(order.getSize()));
         }
 
         order.setStatus(Status.PENDING);
         order.setCreateDate(LocalDateTime.now());
         return orderRepository.save(order);
     }
+
 
     @Override
     public List<Order> listOrders(Long customerId, LocalDateTime startDate, LocalDateTime endDate) {

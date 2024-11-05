@@ -4,6 +4,7 @@ import com.brokage.firm.challenge.inghubs.entity.Asset;
 import com.brokage.firm.challenge.inghubs.entity.Order;
 import com.brokage.firm.challenge.inghubs.entity.Side;
 import com.brokage.firm.challenge.inghubs.entity.Status;
+import com.brokage.firm.challenge.inghubs.exception.NotFoundException;
 import com.brokage.firm.challenge.inghubs.repository.AssetRepository;
 import com.brokage.firm.challenge.inghubs.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class AdminServiceImpl implements AdminService {
     public void matchOrder(Long orderId) {
         // Retrieve the order
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException(ORDER_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(ORDER_NOT_FOUND));
 
         // Check that the order is in PENDING status
         if (order.getStatus() != Status.PENDING) {
@@ -36,7 +37,7 @@ public class AdminServiceImpl implements AdminService {
 
         // Retrieve TRY asset for the customer
         Asset tryAsset = assetRepository.findByCustomerIdAndAssetName(order.getCustomer().getId(), TRY)
-                .orElseThrow(() -> new RuntimeException(CUSTOMER_ASSET_NOT_FOUND));
+                .orElseThrow(() -> new NotFoundException(CUSTOMER_ASSET_NOT_FOUND));
 
         if (order.getOrderSide() == Side.BUY) {
             // Handle BUY order
@@ -60,7 +61,7 @@ public class AdminServiceImpl implements AdminService {
             assetRepository.save(tryAsset);
             assetRepository.save(buyAsset);
 
-        } else if (order.getOrderSide().equals("SELL")) {
+        } else if (order.getOrderSide()==Side.SELL) {
             // SELL order
             Asset sellAsset = assetRepository.findByCustomerIdAndAssetName(order.getCustomer().getId(), order.getAssetName())
                     .orElseThrow(() -> new RuntimeException(ASSET_NOT_FOUND_FOR_SELL_ORDER));
