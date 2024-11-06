@@ -2,6 +2,7 @@ package com.brokage.firm.challenge.inghubs.service;
 
 import com.brokage.firm.challenge.inghubs.entity.Asset;
 import com.brokage.firm.challenge.inghubs.entity.Customer;
+import com.brokage.firm.challenge.inghubs.entity.Role;
 import com.brokage.firm.challenge.inghubs.exception.InsufficientFundsException;
 import com.brokage.firm.challenge.inghubs.repository.AssetRepository;
 import com.brokage.firm.challenge.inghubs.repository.CustomerRepository;
@@ -39,7 +40,7 @@ class TransactionServiceImplTest {
         firstTestCustomer = new Customer();
         firstTestCustomer.setUsername("testUser");
         firstTestCustomer.setPassword("password");
-        firstTestCustomer.setRole("CUSTOMER");
+        firstTestCustomer.setRole(Role.ADMIN);
         customerRepository.save(firstTestCustomer);
 
         Asset tryAsset = new Asset();
@@ -50,9 +51,9 @@ class TransactionServiceImplTest {
         assetRepository.save(tryAsset);
 
         secondTestCustomer = new Customer();
-        secondTestCustomer.setUsername("testUser");
-        secondTestCustomer.setPassword("password");
-        secondTestCustomer.setRole("CUSTOMER");
+        secondTestCustomer.setUsername("testUser1");
+        secondTestCustomer.setPassword("password1");
+        secondTestCustomer.setRole(Role.USER);
         customerRepository.save(secondTestCustomer);
 
         Asset goldAsset = new Asset();

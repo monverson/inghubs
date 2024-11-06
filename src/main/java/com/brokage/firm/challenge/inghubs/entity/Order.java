@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "customer_order")
+@Table(name = "customer_order") // since order is reserved keyword in H2
 @Data
 public class Order {
 

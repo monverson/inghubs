@@ -46,13 +46,13 @@ class AdminServiceImplTest {
         firstTestCustomer = new Customer();
         firstTestCustomer.setUsername("testUser");
         firstTestCustomer.setPassword("password");
-        firstTestCustomer.setRole("CUSTOMER");
+        firstTestCustomer.setRole(Role.ADMIN);
         customerRepository.save(firstTestCustomer);
 
         secondTestCustomer = new Customer();
-        secondTestCustomer.setUsername("testUser");
-        secondTestCustomer.setPassword("password");
-        secondTestCustomer.setRole("CUSTOMER");
+        secondTestCustomer.setUsername("testUser1");
+        secondTestCustomer.setPassword("password2");
+        secondTestCustomer.setRole(Role.USER);
         customerRepository.save(secondTestCustomer);
 
         Asset firstTryAsset = new Asset();
