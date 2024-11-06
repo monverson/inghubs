@@ -34,7 +34,7 @@ public class AuthenticationService {
                 .role(request.getRole())
                 .build();
         Customer savedCustomer = customerRepository.save(customer);
-        String jwtToken = jwtService.generateToken(customer);
+        String jwtToken = jwtService.generateToken(customer,request.getRole().name());
         saveUserToken(savedCustomer, jwtToken);
         return LoginResponse.builder()
                 .accessToken(jwtToken)
@@ -50,7 +50,7 @@ public class AuthenticationService {
         );
         Customer customer = customerRepository.findByUsername(request.getUserName())
                 .orElseThrow();
-        String jwtToken = jwtService.generateToken(customer);
+        String jwtToken = jwtService.generateToken(customer,customer.getRole().name());
         revokeAllUserTokens(customer);
         saveUserToken(customer, jwtToken);
         return LoginResponse.builder()
