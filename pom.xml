@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.brokage.firm.challenge</groupId>
 	<artifactId>inghubs</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>inghubs</name>
 	<description>Java Backend Developer Case (Brokage Firm Challenge)</description>
 	<url/>

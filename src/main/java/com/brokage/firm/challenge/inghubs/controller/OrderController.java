@@ -30,9 +30,9 @@ public class OrderController {
         return ResponseEntity.ok(orderService.listOrders(customerId, startDate, endDate));
     }
 
-    @DeleteMapping("/orders/{orderId}")
+    @DeleteMapping("/{orderId}")
     public ResponseEntity<Void> cancelOrder(@PathVariable Long orderId) {
         orderService.cancelOrder(orderId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }

@@ -19,6 +19,6 @@ public class AdminController {
     @PostMapping("matchedOrder/{orderId}")
     public ResponseEntity<Void> matchOrder(@PathVariable Long orderId) {
         adminService.matchOrder(orderId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 }
