@@ -105,9 +105,12 @@ class TransactionServiceImplTest {
     @Test
     void withdraw_withInsufficientFunds_shouldThrowException() {
         //given
+        Long customerId = firstTestCustomer.getId();
+        BigDecimal amount = BigDecimal.valueOf(50000);
 
         //when
-        Exception exception = assertThrows(InsufficientFundsException.class, () -> transactionService.withdraw(firstTestCustomer.getId(), BigDecimal.valueOf(15000)));
+        Exception exception = assertThrows(InsufficientFundsException.class, () ->
+                transactionService.withdraw(customerId, amount));
 
         //then
         assertEquals(INSUFFICIENT_FUNDS_FOR_BUY_ORDER, exception.getMessage());

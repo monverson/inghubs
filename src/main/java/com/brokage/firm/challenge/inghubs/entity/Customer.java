@@ -27,7 +27,7 @@ public class Customer implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
     @OneToMany(mappedBy = "customer")
-    private List<Token> tokens;
+    private transient List<Token> tokens;
 
     public Customer() {
     }

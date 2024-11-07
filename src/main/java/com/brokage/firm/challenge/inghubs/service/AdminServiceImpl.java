@@ -4,6 +4,7 @@ import com.brokage.firm.challenge.inghubs.entity.Asset;
 import com.brokage.firm.challenge.inghubs.entity.Order;
 import com.brokage.firm.challenge.inghubs.entity.Side;
 import com.brokage.firm.challenge.inghubs.entity.Status;
+import com.brokage.firm.challenge.inghubs.exception.InsufficientFundsException;
 import com.brokage.firm.challenge.inghubs.exception.NotFoundException;
 import com.brokage.firm.challenge.inghubs.exception.PendingOrderNotMatchedException;
 import com.brokage.firm.challenge.inghubs.repository.AssetRepository;
@@ -39,7 +40,7 @@ public class AdminServiceImpl implements AdminService {
             BigDecimal totalCost = order.getPrice().multiply(order.getSize());
 
             if (tryAsset.getUsableSize().compareTo(totalCost) < 0) {
-                throw new RuntimeException(INSUFFICIENT_FUNDS_TO_MATCHED_TO_BUY_ORDER);
+                throw new InsufficientFundsException(INSUFFICIENT_FUNDS_TO_MATCHED_TO_BUY_ORDER);
             }
 
             tryAsset.setUsableSize(tryAsset.getUsableSize().subtract(totalCost));
@@ -56,7 +57,7 @@ public class AdminServiceImpl implements AdminService {
             Asset sellAsset = assetRepository.findByCustomerIdAndAssetName(order.getCustomer().getId(), order.getAssetName()).orElseThrow(() -> new RuntimeException(ASSET_NOT_FOUND_FOR_SELL_ORDER));
 
             if (sellAsset.getUsableSize().compareTo(order.getSize()) < 0) {
-                throw new RuntimeException(INSUFFICIENT_ASSET_TO_MATCH_THE_SELL_ORDER);
+                throw new InsufficientFundsException(INSUFFICIENT_ASSET_TO_MATCH_THE_SELL_ORDER);
             }
 
             sellAsset.setUsableSize(sellAsset.getUsableSize().subtract(order.getSize()));

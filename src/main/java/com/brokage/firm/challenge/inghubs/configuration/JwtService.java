@@ -2,7 +2,6 @@ package com.brokage.firm.challenge.inghubs.configuration;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -44,11 +43,11 @@ public class JwtService {
 
     private String buildToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
         return Jwts.builder().
-                setClaims(extraClaims).
-                setSubject(userDetails.getUsername()).
-                setIssuedAt(new Date(System.currentTimeMillis())).
-                setExpiration(new Date(System.currentTimeMillis() + expiration)).
-                signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
+                claims(extraClaims).
+                subject(userDetails.getUsername()).
+                issuedAt(new Date(System.currentTimeMillis())).
+                expiration(new Date(System.currentTimeMillis() + expiration)).
+                signWith(getSignInKey()).compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -67,7 +66,7 @@ public class JwtService {
     private Claims extractAllClaims(String token) {
         return Jwts.parser().
                 setSigningKey(getSignInKey()).build().
-                parseClaimsJws(token).getBody();
+                parseClaimsJws(token).getPayload();
     }
 
     private Key getSignInKey() {

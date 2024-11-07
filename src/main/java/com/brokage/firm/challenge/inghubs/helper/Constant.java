@@ -1,5 +1,9 @@
 package com.brokage.firm.challenge.inghubs.helper;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access= AccessLevel.PRIVATE)
 public class Constant {
     public static final String TRY = "TRY";
     public static final String CUSTOMER_ASSET_NOT_FOUND = "Customer has no TRY asset";

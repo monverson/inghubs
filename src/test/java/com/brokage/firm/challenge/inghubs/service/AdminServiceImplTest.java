@@ -148,9 +148,11 @@ class AdminServiceImplTest {
         sellOrder.setPrice(BigDecimal.valueOf(100));
         Order createdOrder = orderService.createOrder(sellOrder);
         createdOrder.setStatus(Status.CANCELED);
+        Long id= createdOrder.getId();
 
         //when
-        Exception exception = assertThrows(PendingOrderNotMatchedException.class, () -> adminService.matchOrder(createdOrder.getId()));
+        Exception exception = assertThrows(PendingOrderNotMatchedException.class, () ->
+                adminService.matchOrder(id));
 
         //then
         assertEquals(PENDING_ORDER_CAN_BE_MATCHED, exception.getMessage());

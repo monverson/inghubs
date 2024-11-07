@@ -183,9 +183,11 @@ class OrderServiceImplTest {
         sellOrder.setPrice(BigDecimal.valueOf(100));
         Order createdOrder = orderService.createOrder(sellOrder);
         createdOrder.setStatus(Status.CANCELED);
+        Long orderId = createdOrder.getId();
 
         //when
-        Exception exception = assertThrows(PendingStatusCanBeDeletedException.class, () -> orderService.cancelOrder(createdOrder.getId()));
+        Exception exception = assertThrows(PendingStatusCanBeDeletedException.class, () ->
+                orderService.cancelOrder(orderId));
 
         //then
         assertEquals(PENDING_STATUS_CAN_BE_DELETED, exception.getMessage());
