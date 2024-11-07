@@ -3,7 +3,6 @@ package com.brokage.firm.challenge.inghubs.controller;
 import com.brokage.firm.challenge.inghubs.entity.Order;
 import com.brokage.firm.challenge.inghubs.service.OrderService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -25,7 +24,9 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Order>> listOrders(@RequestParam Long customerId, @RequestParam LocalDateTime startDate, @RequestParam LocalDateTime endDate) {
+    public ResponseEntity<List<Order>> listOrders(@RequestParam Long customerId,
+                                                  @RequestParam LocalDateTime startDate,
+                                                  @RequestParam LocalDateTime endDate) {
         return ResponseEntity.ok(orderService.listOrders(customerId, startDate, endDate));
     }
 

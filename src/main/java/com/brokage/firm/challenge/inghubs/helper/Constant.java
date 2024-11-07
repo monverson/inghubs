@@ -9,6 +9,5 @@ public class Constant {
     public static final String PENDING_ORDER_CAN_BE_MATCHED = "Only pending orders can be matched";
     public static final String INSUFFICIENT_FUNDS_TO_MATCHED_TO_BUY_ORDER = "Insufficient Funds to Matched to Buy Order";
     public static final String ASSET_NOT_FOUND_FOR_SELL_ORDER = "Asset not found for sell order";
-    public static final String INSUFFICIENT_ASSET_TO_MATCH_THE_SELL_ORDER= "Insufficient asset size to match the SELL order";
-
+    public static final String INSUFFICIENT_ASSET_TO_MATCH_THE_SELL_ORDER = "Insufficient asset size to match the SELL order";
 }
