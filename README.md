@@ -9,7 +9,7 @@ This project is a Spring Boot application packaged as an executable JAR file. Th
 
 ### Database
 * This application uses H2 memory database.You lost all data in db after stop the application.
-* After starting the application, we can navigate to http://localhost:8080/h2-console, which will present us with a login page.On the login page, we’ll supply the same credentials that we used in the application.properties:
+* After starting the application, we can navigate to http://localhost:8080/h2-console, which will present us with a login page.On the login page, we’ll supply the same credentials that we used in the application.properties
   Once we connect, we’ll see a comprehensive webpage that lists all the tables on the left side of the page and a textbox for running SQL queries:
 
 ## REST API
